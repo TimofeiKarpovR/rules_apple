@@ -153,6 +153,16 @@ A list of framework targets (see
 that this target depends on.
 """,
             ),
+            "link_frameworks": attr.label_list(
+                providers = [[AppleBundleInfo, IosFrameworkBundleInfo]],
+                doc = """
+A list of framework targets (see
+[`ios_framework`](https://github.com/bazelbuild/rules_apple/blob/master/doc/rules-ios.md#ios_framework))
+that this target links against but does not embed. Unlike `frameworks`, these
+frameworks are not copied into the test bundle and must be made available at
+runtime by other means.
+""",
+            ),
         },
     ],
 )
@@ -227,6 +237,16 @@ _ios_internal_unit_test_bundle = rule_factory.create_apple_rule(
 A list of framework targets (see
 [`ios_framework`](https://github.com/bazelbuild/rules_apple/blob/master/doc/rules-ios.md#ios_framework))
 that this target depends on.
+""",
+            ),
+            "link_frameworks": attr.label_list(
+                providers = [[AppleBundleInfo, IosFrameworkBundleInfo]],
+                doc = """
+A list of framework targets (see
+[`ios_framework`](https://github.com/bazelbuild/rules_apple/blob/master/doc/rules-ios.md#ios_framework))
+that this target links against but does not embed. Unlike `frameworks`, these
+frameworks are not copied into the test bundle and must be made available at
+runtime by other means.
 """,
             ),
         },

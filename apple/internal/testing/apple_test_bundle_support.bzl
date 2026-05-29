@@ -388,10 +388,12 @@ def _apple_test_bundle_impl(*, ctx, product_type):
             extra_link_inputs.extend(linker_input.additional_inputs)
             extra_linkopts.extend(linker_input.user_link_flags)
 
+    link_frameworks = getattr(ctx.attr, "link_frameworks", [])
+
     link_result = linking_support.register_binary_linking_action(
         ctx,
         cc_toolchains = cc_toolchain_forwarder,
-        avoid_deps = getattr(ctx.attr, "frameworks", []),
+        avoid_deps = getattr(ctx.attr, "frameworks", []) + link_frameworks,
         bundle_loader = bundle_loader,
         # Unit/UI tests do not use entitlements.
         entitlements = None,
@@ -418,6 +420,10 @@ def _apple_test_bundle_impl(*, ctx, product_type):
         debug_dependencies.extend(frameworks)
     else:
         targets_to_avoid = []
+
+    if link_frameworks:
+        targets_to_avoid.extend(link_frameworks)
+        debug_dependencies.extend(link_frameworks)
 
     if bundle_loader:
         targets_to_avoid.append(bundle_loader)

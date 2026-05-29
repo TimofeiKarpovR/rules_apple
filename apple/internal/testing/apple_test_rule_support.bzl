@@ -83,6 +83,9 @@ def _coverage_files_aspect_impl(target, ctx):
     for fmwk in getattr(rule_attrs, "frameworks", []):
         coverage_files.append(fmwk[_CoverageFilesInfo].coverage_files)
         transitive_binaries_sets.append(fmwk[_CoverageFilesInfo].covered_binaries)
+    for fmwk in getattr(rule_attrs, "link_frameworks", []):
+        coverage_files.append(fmwk[_CoverageFilesInfo].coverage_files)
+        transitive_binaries_sets.append(fmwk[_CoverageFilesInfo].covered_binaries)
 
     if hasattr(rule_attrs, "test_host") and rule_attrs.test_host:
         coverage_files.append(rule_attrs.test_host[_CoverageFilesInfo].coverage_files)
@@ -99,7 +102,7 @@ def _coverage_files_aspect_impl(target, ctx):
     ]
 
 coverage_files_aspect = aspect(
-    attr_aspects = ["deps", "frameworks", "test_host"],
+    attr_aspects = ["deps", "frameworks", "link_frameworks", "test_host"],
     doc = """
 This aspect walks the dependency graph through the dependency graph and collects all the sources and
 headers that are depended upon transitively. These files are needed to calculate test coverage on a
@@ -278,8 +281,14 @@ def _apple_test_rule_impl(*, ctx, requires_dossiers, test_type):
 
     # ctx.expand_make_variables is marked deprecated in the docs but every ruleset uses it. Not
     # sure how they're planning on getting rid of it for good.
+    # Location expansion (e.g. $(location), $(rlocationpath)) is resolved first against `data`,
+    # matching the behaviour of native test rules' `env` attribute.
     rule_test_env = {
-        k: ctx.expand_make_variables("env", v, {})
+        k: ctx.expand_make_variables(
+            "env",
+            ctx.expand_location(v, targets = ctx.attr.data),
+            {},
+        )
         for k, v in ctx.attr.env.items()
     }
 

@@ -31,6 +31,7 @@ _BUNDLE_ATTRS = {
         "bundle_name",
         "families",
         "frameworks",
+        "link_frameworks",
         "infoplists",
         "linkopts",
         "provisioning_profile",
